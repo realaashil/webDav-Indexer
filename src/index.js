@@ -15,7 +15,7 @@ async function handleRequest(request) {
 		return listFiles(webdavUrl, username, password);
 	} else if (pathname.startsWith('/download')) {
 		const filePath = pathname.replace('/download', '');
-		return downloadFile(request, webdavUrl, username, password, filePath);
+		return downloadFile(webdavUrl, username, password, filePath);
 	} else {
 		return new Response('Not found', { status: 404 });
 	}
@@ -70,16 +70,10 @@ function parseWebDAVResponse(xml) {
 	return files;
 }
 
-async function downloadFile(request, webdavUrl, username, password, filePath) {
-	const range = request.headers.get('Range');
-
+async function downloadFile(webdavUrl, username, password, filePath) {
 	const headers = {
 		Authorization: 'Basic ' + btoa(`${username}:${password} `),
 	};
-
-	if (range) {
-		headers['Range'] = range;
-	}
 
 	const response = await fetch(`${webdavUrl}${filePath} `, { headers });
 
